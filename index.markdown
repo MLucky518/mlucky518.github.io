@@ -1,6 +1,12 @@
 ---
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
-
-layout: home
+layout: landing
+title: Home
+hero:
+  name: "Michael Luck"
+  tagline: "Level 34 Full-Stack Developer"
+  xp_percent: 85
+  cta_label: "Explore My Work"
+  cta_href: "#projects"
 ---
+
+<!-- Content is handled in layout via front matter -->
