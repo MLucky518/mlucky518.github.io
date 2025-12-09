@@ -1,0 +1,53 @@
+---
+layout: default
+---
+
+<div class="post-wrapper">
+  <a href="{{ '/blog/' | relative_url }}" class="post-back-link">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
+    Back to Blog
+  </a>
+
+  <div class="post-meta">
+    <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %-d, %Y" }}</time>
+    {% for category in page.categories %}
+    <span class="post-category-badge">{{ category }}</span>
+    {% endfor %}
+  </div>
+
+  <h1 class="post-title">{{ page.title }}</h1>
+
+  <div class="post-body">
+    {{ content }}
+  </div>
+
+  {% if page.tags.size > 0 %}
+  <div class="post-tags">
+    {% for tag in page.tags %}
+    <span class="post-tag">#{{ tag }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if page.previous.url or page.next.url %}
+  <div class="post-navigation">
+    {% if page.previous.url %}
+    <a href="{{ page.previous.url | relative_url }}" class="post-nav-link prev">
+      <span class="nav-label">← Previous</span>
+      <span class="nav-title">{{ page.previous.title | truncate: 50 }}</span>
+    </a>
+    {% else %}
+    <div></div>
+    {% endif %}
+
+    {% if page.next.url %}
+    <a href="{{ page.next.url | relative_url }}" class="post-nav-link next">
+      <span class="nav-label">Next →</span>
+      <span class="nav-title">{{ page.next.title | truncate: 50 }}</span>
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>

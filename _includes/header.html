@@ -1,23 +1,72 @@
 <header class="site-header">
   <div class="container header-container">
     <div class="logo">
-      <a href="{{ '/' | relative_url }}">ML</a>
+      <a href="{{ '/' | relative_url }}">
+        <img src="{{ '/assets/images/logo-light.png' | relative_url }}" alt="ML Logo" class="logo-img logo-light">
+        <img src="{{ '/assets/images/logo-dark.jpg' | relative_url }}" alt="ML Logo" class="logo-img logo-dark">
+      </a>
     </div>
-    
+
     <button class="menu-toggle" aria-label="Toggle menu">
       <span></span>
       <span></span>
       <span></span>
     </button>
-    
+
     <nav>
       <ul>
-        <li><a href="{{ '/' | relative_url }}" {% if page.url == '/' %}class="active"{% endif %}>Home</a></li>
-        <li><a href="{{ '/projects' | relative_url }}" {% if page.url contains '/projects' %}class="active"{% endif %}>Projects</a></li>
-        <li><a href="{{ '/blog' | relative_url }}" {% if page.url contains '/blog' %}class="active"{% endif %}>Blog</a></li>
-        <li><a href="{{ '/about' | relative_url }}" {% if page.url contains '/about' %}class="active"{% endif %}>About</a></li>
-        <li><a href="{{ '/contact' | relative_url }}" {% if page.url contains '/contact' %}class="active"{% endif %}>Contact</a></li>
+        <li><a href="{{ '/' | relative_url }}" {% if page.url=='/' %}class="active" {% endif %}>Home</a></li>
+        <li><a href="{{ '/blog' | relative_url }}" {% if page.url contains '/blog' %}class="active" {% endif %}>Blog</a>
+        </li>
+        <li><a href="{{ '/about' | relative_url }}" {% if page.url contains '/about' %}class="active" {% endif
+            %}>About</a></li>
+        <li><a href="{{ '/contact' | relative_url }}" {% if page.url contains '/contact' %}class="active" {% endif
+            %}>Contact</a></li>
       </ul>
     </nav>
+
+    <!-- Dark Mode Toggle -->
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+      <svg class="sun-icon" viewBox="0 0 24 24" width="22" height="22">
+        <circle cx="12" cy="12" r="5" fill="currentColor" />
+        <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="12" y1="1" x2="12" y2="3" />
+          <line x1="12" y1="21" x2="12" y2="23" />
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+          <line x1="1" y1="12" x2="3" y2="12" />
+          <line x1="21" y1="12" x2="23" y2="12" />
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        </g>
+      </svg>
+      <svg class="moon-icon" viewBox="0 0 24 24" width="22" height="22">
+        <path fill="currentColor" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+      </svg>
+    </button>
   </div>
 </header>
+
+<script>
+  // Dark mode toggle
+  const themeToggle = document.getElementById('theme-toggle');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+  function setTheme(dark) {
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    localStorage.setItem('theme', dark ? 'dark' : 'light');
+  }
+
+  // Check for saved preference, default to dark
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) {
+    setTheme(savedTheme === 'dark');
+  } else {
+    setTheme(true); // Default to dark mode
+  }
+
+  themeToggle.addEventListener('click', () => {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    setTheme(!isDark);
+  });
+</script>

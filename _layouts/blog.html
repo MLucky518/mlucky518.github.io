@@ -1,0 +1,97 @@
+---
+layout: default
+---
+
+<main class="blog-page">
+  <!-- Subtle pixel decorations -->
+  <div class="blog-decorations">
+    <div class="pixel-accent pixel-accent-1"></div>
+    <div class="pixel-accent pixel-accent-2"></div>
+    <div class="pixel-accent pixel-accent-3"></div>
+  </div>
+
+  <!-- Hero Header -->
+  <header class="blog-hero">
+    <div class="blog-hero-content">
+      <span class="blog-badge">📝 BLOG</span>
+      <h1 class="blog-title">Adventures in Code</h1>
+      <p class="blog-tagline">Musings, tutorials, and discoveries from my coding journey</p>
+    </div>
+  </header>
+
+  <div class="blog-layout">
+    <!-- Main Content -->
+    <section class="blog-posts">
+      {% for post in site.posts %}
+      <article class="post-card">
+        {% if post.image %}
+        <div class="post-card-image">
+          <img src="{{ post.image | relative_url }}" alt="{{ post.title }}" loading="lazy">
+        </div>
+        {% endif %}
+
+        <div class="post-card-content">
+          <div class="post-card-meta">
+            <time class="post-date" datetime="{{ post.date | date_to_xmlschema }}">
+              {{ post.date | date: "%b %d, %Y" }}
+            </time>
+            {% if post.categories.size > 0 %}
+            <span class="post-category-badge">{{ post.categories.first }}</span>
+            {% endif %}
+          </div>
+
+          <h2 class="post-card-title">
+            <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+          </h2>
+
+          <p class="post-card-excerpt">
+            {{ post.excerpt | strip_html | truncatewords: 25 }}
+          </p>
+
+          <a href="{{ post.url | relative_url }}" class="read-more-btn">
+            Read Article
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </a>
+        </div>
+      </article>
+      {% endfor %}
+    </section>
+
+    <!-- Sidebar -->
+    <aside class="blog-sidebar">
+      <div class="sidebar-card sidebar-about">
+        <div class="sidebar-avatar">
+          <img src="{{ '/assets/images/me.png' | relative_url }}" alt="Michael Luck">
+        </div>
+        <h3>Michael Luck</h3>
+        <p>Full-stack developer sharing my journey through code, design, and technology.</p>
+      </div>
+
+      <div class="sidebar-card sidebar-categories">
+        <h4>Categories</h4>
+        <div class="category-pills">
+          {% for category in site.categories %}
+          <a href="#" class="category-pill">
+            {{ category[0] | capitalize }}
+            <span class="category-count">{{ category[1].size }}</span>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="sidebar-card sidebar-stats">
+        <h4>Blog Stats</h4>
+        <div class="stat-row">
+          <span class="stat-label">Posts</span>
+          <span class="stat-value">{{ site.posts.size }}</span>
+        </div>
+        <div class="stat-xp-bar">
+          <div class="stat-xp-fill" style="width: {{ site.posts.size | times: 10 | at_most: 100 }}%"></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</main>
