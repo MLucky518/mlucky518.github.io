@@ -26,7 +26,7 @@
   width: 8px;
   height: 8px;
   background: linear-gradient(135deg, #000 0%, #333 100%);
-  opacity: 0.06;
+  opacity: 0.03;
   animation: float-subtle 20s ease-in-out infinite;
 }
 
@@ -76,16 +76,124 @@
   margin: 0 auto;
 }
 
-.blog-badge {
-  display: inline-block;
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.6rem;
-  letter-spacing: 2px;
-  color: #666;
-  background: #f5f5f5;
-  padding: 0.5rem 1rem;
+.wizard-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  position: relative;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.15) 0%, rgba(79, 70, 229, 0.15) 100%) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid rgba(147, 51, 234, 0.3);
   border-radius: 100px;
-  margin-bottom: 1.5rem;
+  margin-top: 20px;
+  box-shadow:
+    0 4px 20px rgba(147, 51, 234, 0.2),
+    0 0 40px rgba(147, 51, 234, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  animation: wizardGlow 3s ease-in-out infinite;
+  pointer-events: none;
+  user-select: none;
+  text-decoration: none !important;
+  cursor: default !important;
+}
+
+.wizard-badge:hover,
+.wizard-badge:active,
+.wizard-badge:focus {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.15) 0%, rgba(79, 70, 229, 0.15) 100%) !important;
+  text-decoration: none !important;
+}
+
+a .wizard-badge,
+a.wizard-badge {
+  pointer-events: none !important;
+  text-decoration: none !important;
+}
+
+a:hover .wizard-badge,
+a.wizard-badge:hover {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.15) 0%, rgba(79, 70, 229, 0.15) 100%) !important;
+}
+
+@keyframes wizardGlow {
+  0%, 100% {
+    box-shadow:
+      0 4px 20px rgba(147, 51, 234, 0.2),
+      0 0 40px rgba(147, 51, 234, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 4px 30px rgba(147, 51, 234, 0.4),
+      0 0 60px rgba(147, 51, 234, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+}
+
+.wizard-icon {
+  font-size: 1.5rem;
+  animation: wizardFloat 2s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(147, 51, 234, 0.3));
+}
+
+@keyframes wizardFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(-5deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(5deg);
+  }
+}
+
+.wizard-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, #9333ea 0%, #4f46e5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sparkle {
+  position: absolute;
+  font-size: 0.8rem;
+  animation: sparkleFloat 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.5));
+}
+
+.sparkle-1 {
+  top: -8px;
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.sparkle-2 {
+  top: -8px;
+  right: 20%;
+  animation-delay: 0.7s;
+}
+
+.sparkle-3 {
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation-delay: 1.4s;
+}
+
+@keyframes sparkleFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-10px) scale(1.2);
+    opacity: 1;
+  }
 }
 
 .blog-title {
@@ -93,11 +201,11 @@
   font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: 700;
   letter-spacing: -0.03em;
-  background: linear-gradient(135deg, #000 0%, #444 50%, #000 100%);
+  background: linear-gradient(135deg, #333 0%, #666 50%, #333 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   line-height: 1.1;
 }
 
@@ -131,12 +239,14 @@
 }
 
 .post-card {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .post-card:hover {
@@ -230,9 +340,13 @@
   color: #000;
   text-decoration: none;
   padding: 0.75rem 1.25rem;
-  background: #f5f5f5;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 10px;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .read-more-btn::after {
@@ -240,8 +354,12 @@
 }
 
 .read-more-btn:hover {
-  background: #000;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 .read-more-btn svg {
@@ -332,13 +450,17 @@
   gap: 0.5rem;
   font-family: 'Inter', sans-serif;
   font-size: 0.85rem;
-  font-weight: 500;
-  color: #333;
-  background: #f5f5f5;
+  font-weight: 600;
+  color: #000;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   padding: 0.5rem 1rem;
   border-radius: 100px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
   text-decoration: none;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .category-pill::after {
@@ -362,39 +484,6 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Stats Card */
-.stat-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
-}
-
-.stat-label {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.stat-value {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.7rem;
-  color: #000;
-}
-
-.stat-xp-bar {
-  height: 8px;
-  background: #f0f0f0;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.stat-xp-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #333 0%, #000 100%);
-  border-radius: 4px;
-  transition: width 1s ease;
-}
 
 /* =========================================
    Individual Post Page Styles
@@ -760,8 +849,43 @@
   background: #0f0f0f;
 }
 
-[data-theme="dark"] .blog-header h1 {
-  color: #f0f0f0;
+[data-theme="dark"] .pixel-accent {
+  background: linear-gradient(135deg, #fff 0%, #888 100%);
+  opacity: 0.02;
+}
+
+[data-theme="dark"] .wizard-badge {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%) !important;
+  border-color: rgba(168, 85, 247, 0.5);
+  box-shadow:
+    0 4px 20px rgba(168, 85, 247, 0.3),
+    0 0 40px rgba(168, 85, 247, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+  user-select: none;
+}
+
+[data-theme="dark"] .wizard-badge:hover,
+[data-theme="dark"] .wizard-badge:active,
+[data-theme="dark"] .wizard-badge:focus,
+[data-theme="dark"] a:hover .wizard-badge,
+[data-theme="dark"] a.wizard-badge:hover {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%) !important;
+  text-decoration: none !important;
+}
+
+[data-theme="dark"] .wizard-text {
+  background: linear-gradient(135deg, #c084fc 0%, #818cf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="dark"] .blog-title {
+  background: linear-gradient(135deg, #d4d4d4 0%, #a3a3a3 50%, #d4d4d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 [data-theme="dark"] .blog-header .blog-subtitle {
@@ -769,8 +893,11 @@
 }
 
 [data-theme="dark"] .post-card {
-  background: #1a1a1a;
-  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(40, 40, 40, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 [data-theme="dark"] .card-title {
@@ -786,8 +913,11 @@
 }
 
 [data-theme="dark"] .sidebar-card {
-  background: rgba(30, 30, 30, 0.8);
-  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(40, 40, 40, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 [data-theme="dark"] .sidebar-card h3 {
@@ -798,14 +928,17 @@
   color: #aaa;
 }
 
-[data-theme="dark"] .category-list a {
+[data-theme="dark"] .category-pill {
+  background: rgba(255, 255, 255, 0.9);
   color: #000 !important;
-  background: #fff !important;
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
-[data-theme="dark"] .category-list a:hover {
-  background: #fff;
-  color: #000;
+[data-theme="dark"] .category-pill:hover {
+  background: rgba(255, 255, 255, 1);
+  color: #000 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
 }
 
 /* Post Page Dark Mode */
@@ -899,15 +1032,21 @@
   background-color: #fff !important;
 }
 
-/* Read more button on blog index page - keep black text as button is white */
+/* Read more button on blog index page - glassmorphic in dark mode */
 [data-theme="dark"] a.read-more-btn,
 [data-theme="dark"] .read-more-btn {
-  color: #000 !important;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #e8e8e8 !important;
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 [data-theme="dark"] a.read-more-btn:hover,
 [data-theme="dark"] .read-more-btn:hover {
-  color: #333 !important;
+  background: rgba(255, 255, 255, 0.9);
+  color: #121212 !important;
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 /* Post card title link */

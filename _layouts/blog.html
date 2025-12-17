@@ -13,9 +13,15 @@ layout: default
   <!-- Hero Header -->
   <header class="blog-hero">
     <div class="blog-hero-content">
-      <span class="blog-badge">📝 BLOG</span>
       <h1 class="blog-title">Adventures in Code</h1>
-      <p class="blog-tagline">Musings, tutorials, and discoveries from my coding journey</p>
+      <p class="blog-tagline">Conjuring up tutorials, insights, and discoveries from my coding spellbook</p>
+      <div class="wizard-badge">
+        <span class="wizard-icon">🧙‍♂️</span>
+        <span class="sparkle sparkle-1">✨</span>
+        <span class="sparkle sparkle-2">✨</span>
+        <span class="sparkle sparkle-3">⭐</span>
+        <span class="wizard-text">Magical Musings</span>
+      </div>
     </div>
   </header>
 
@@ -82,16 +88,6 @@ layout: default
         </div>
       </div>
 
-      <div class="sidebar-card sidebar-stats">
-        <h4>Blog Stats</h4>
-        <div class="stat-row">
-          <span class="stat-label">Posts</span>
-          <span class="stat-value">{{ site.posts.size }}</span>
-        </div>
-        <div class="stat-xp-bar">
-          <div class="stat-xp-fill" style="width: {{ site.posts.size | times: 10 | at_most: 100 }}%"></div>
-        </div>
-      </div>
     </aside>
   </div>
 </main>

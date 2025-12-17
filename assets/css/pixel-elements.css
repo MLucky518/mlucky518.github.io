@@ -1,46 +1,140 @@
+/* Pixel Art Elements Container */
+#pixel-elements {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
 /* Pixel Art Elements */
 .pixel-element {
   position: absolute;
   z-index: 1;
-  opacity: 0.7; /* Slightly increased opacity for better visibility */
+  opacity: 0.8;
   pointer-events: none;
-  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.15)); /* Slightly stronger shadow */
   image-rendering: pixelated;
   transition: transform 0.3s ease;
-  animation-delay: 0.5s !important; /* Delay all animations to prevent initial shake */
+  will-change: transform;
+}
+
+/* Magical trail effect using pseudo-elements */
+.pixel-element::before,
+.pixel-element::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: inherit;
+  opacity: 0;
+  pointer-events: none;
+  border-radius: 50%;
 }
 
 .pixel-star {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23FFD700' d='M8 1l2 5h5l-4 3 2 5-5-3-5 3 2-5-4-3h5z'/%3E%3C/svg%3E");
   background-size: contain;
-  animation: float 6s infinite ease-in-out;
+  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 20px rgba(255, 215, 0, 0.4));
+}
+
+.pixel-star::before {
+  animation: starTrail1 0.8s infinite;
+}
+
+.pixel-star::after {
+  animation: starTrail2 0.8s infinite;
+  animation-delay: 0.2s;
+}
+
+.pixel-star:nth-child(1) {
+  animation: shootingStar1 8s infinite ease-in-out;
+  transform: translate(-10vw, 110vh) rotate(0deg);
+  opacity: 0;
+}
+
+.pixel-star:nth-child(2) {
+  animation: shootingStar2 10s infinite ease-in-out;
+  animation-delay: 4s;
 }
 
 .pixel-potion {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='%239370DB' d='M4 1h4v2h-1v3l2 4H3l2-4V3H4z'/%3E%3C/svg%3E");
   background-size: contain;
-  animation: float 4s infinite ease-in-out;
+  filter: drop-shadow(0 0 10px rgba(147, 112, 219, 0.7)) drop-shadow(0 0 18px rgba(147, 112, 219, 0.4));
+}
+
+.pixel-potion::before {
+  animation: potionTrail1 0.7s infinite;
+  filter: blur(4px);
+}
+
+.pixel-potion::after {
+  animation: potionTrail2 0.7s infinite;
+  animation-delay: 0.18s;
+  filter: blur(6px);
+}
+
+.pixel-potion:nth-child(6) {
+  animation: bubblePath1 9s infinite ease-in-out;
+  animation-delay: 5s;
 }
 
 .pixel-sword {
-  width: 24px;
-  height: 24px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23d0d0d0' d='M8 1v2l1 1v3l4 4v2l-2 2-2-2-4-4H2l-1-1 1-1h3l1-1 1-1V3z'/%3E%3Cpath fill='%23a0a0a0' d='M8 3v1l1 1v2l4 4v1l-1 1-1-1-4-4H4l-1-1h3l1-1z'/%3E%3C/svg%3E");
+  width: 28px;
+  height: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23e0e0e0' d='M8 1v2l1 1v3l4 4v2l-2 2-2-2-4-4H2l-1-1 1-1h3l1-1 1-1V3z'/%3E%3Cpath fill='%23c0c0c0' d='M8 3v1l1 1v2l4 4v1l-1 1-1-1-4-4H4l-1-1h3l1-1z'/%3E%3C/svg%3E");
   background-size: contain;
-  animation: float 8s infinite ease-in-out;
-  animation-delay: 0.5s; /* Delay the start to prevent initial shake */
+  filter: drop-shadow(0 0 8px rgba(220, 220, 255, 0.6)) drop-shadow(0 0 15px rgba(180, 180, 255, 0.3));
+}
+
+.pixel-sword::before {
+  animation: swordTrail1 0.4s infinite;
+  filter: blur(5px);
+}
+
+.pixel-sword::after {
+  animation: swordTrail2 0.4s infinite;
+  animation-delay: 0.1s;
+  filter: blur(7px);
+}
+
+.pixel-sword:nth-child(3) {
+  animation: slashDiagonal1 6s infinite ease-in-out;
+  animation-delay: 1.5s;
+  transform: translate(110vw, -10vh) rotate(45deg) scale(1);
+  opacity: 0;
 }
 
 .pixel-heart {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath fill='%23ff6b6b' d='M5 9L1 5C0 4 0 2 1 1c1-1 3-1 4 1 1-2 3-2 4-1 1 1 1 3 0 4z'/%3E%3C/svg%3E");
   background-size: contain;
-  animation: pulse-heart 2s infinite ease-in-out;
+  filter: drop-shadow(0 0 10px rgba(255, 107, 107, 0.7)) drop-shadow(0 0 18px rgba(255, 107, 107, 0.4));
+}
+
+.pixel-heart::before {
+  animation: heartTrail1 0.6s infinite;
+  filter: blur(4px);
+}
+
+.pixel-heart::after {
+  animation: heartTrail2 0.6s infinite;
+  animation-delay: 0.15s;
+  filter: blur(6px);
+}
+
+.pixel-heart:nth-child(2) {
+  animation: heartBounce 7s infinite ease-in-out;
+  animation-delay: 3s;
+  transform: translate(-10vw, 50vh) scale(1);
+  opacity: 0;
 }
 
 @keyframes pulse-heart {
@@ -82,19 +176,349 @@
 
 /* New pixel elements */
 .pixel-gem {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='%2350C878' d='M6 1l3 3-3 7-3-7z'/%3E%3C/svg%3E");
   background-size: contain;
-  animation: float 4.5s infinite ease-in-out;
+  filter: drop-shadow(0 0 10px rgba(80, 200, 120, 0.7)) drop-shadow(0 0 18px rgba(80, 200, 120, 0.4));
+}
+
+.pixel-gem::before {
+  animation: gemTrail1 0.6s infinite;
+  filter: blur(4px);
+}
+
+.pixel-gem::after {
+  animation: gemTrail2 0.6s infinite;
+  animation-delay: 0.15s;
+  filter: blur(6px);
+}
+
+.pixel-gem:nth-child(3) {
+  animation: zigzagGem1 7s infinite ease-in-out;
+  animation-delay: 2s;
 }
 
 .pixel-coin {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Ccircle fill='%23FFD700' cx='5' cy='5' r='4'/%3E%3Ccircle fill='%23DAA520' cx='5' cy='5' r='2'/%3E%3C/svg%3E");
   background-size: contain;
-  animation: spin 3s infinite linear;
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6)) drop-shadow(0 0 15px rgba(255, 215, 0, 0.3));
+}
+
+.pixel-coin::before {
+  animation: coinTrail1 0.5s infinite;
+  filter: blur(3px);
+}
+
+.pixel-coin::after {
+  animation: coinTrail2 0.5s infinite;
+  animation-delay: 0.12s;
+  filter: blur(5px);
+}
+
+.pixel-coin:nth-child(4) {
+  animation: spinAcross1 6s infinite linear;
+  animation-delay: 1s;
+}
+
+/* Star animations - shooting diagonally across screen */
+@keyframes shootingStar1 {
+  0% {
+    transform: translate(-10vw, 110vh) rotate(0deg);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(60vw, -10vh) rotate(720deg);
+    opacity: 1;
+  }
+  55% {
+    opacity: 0;
+  }
+  100% {
+    transform: translate(110vw, -10vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes shootingStar2 {
+  0% {
+    transform: translate(110vw, -10vh) rotate(0deg);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(40vw, 110vh) rotate(-720deg);
+    opacity: 1;
+  }
+  55% {
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-10vw, 110vh) rotate(-720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes shootingStar3 {
+  0% {
+    transform: translate(-10vw, 50vh) rotate(0deg);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(110vw, 50vh) rotate(360deg);
+    opacity: 1;
+  }
+  55% {
+    opacity: 0;
+  }
+  100% {
+    transform: translate(110vw, 50vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Gem animations - zigzag movement */
+@keyframes zigzagGem1 {
+  0% {
+    transform: translate(0, -10vh) scale(1) rotate(0deg);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  25% {
+    transform: translate(30vw, 30vh) scale(1.2) rotate(180deg);
+  }
+  50% {
+    transform: translate(10vw, 70vh) scale(1) rotate(360deg);
+  }
+  75% {
+    transform: translate(40vw, 110vh) scale(1.1) rotate(540deg);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(50vw, 120vh) scale(1) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes zigzagGem2 {
+  0% {
+    transform: translate(100vw, -10vh) scale(1) rotate(0deg);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  25% {
+    transform: translate(60vw, 35vh) scale(1.2) rotate(-180deg);
+  }
+  50% {
+    transform: translate(80vw, 65vh) scale(1) rotate(-360deg);
+  }
+  75% {
+    transform: translate(50vw, 100vh) scale(1.1) rotate(-540deg);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(40vw, 120vh) scale(1) rotate(-720deg);
+    opacity: 0;
+  }
+}
+
+/* Coin animations - spinning across screen */
+@keyframes spinAcross1 {
+  0% {
+    transform: translate(-10vw, 20vh) rotateY(0deg);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(110vw, 20vh) rotateY(1800deg);
+    opacity: 1;
+  }
+  55% {
+    opacity: 0;
+  }
+  100% {
+    transform: translate(110vw, 20vh) rotateY(1800deg);
+    opacity: 0;
+  }
+}
+
+@keyframes spinAcross2 {
+  0% {
+    transform: translate(110vw, 70vh) rotateY(0deg);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-10vw, 70vh) rotateY(-1800deg);
+    opacity: 1;
+  }
+  55% {
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-10vw, 70vh) rotateY(-1800deg);
+    opacity: 0;
+  }
+}
+
+/* Sword animations - slashing diagonally */
+@keyframes slashDiagonal1 {
+  0% {
+    transform: translate(110vw, -10vh) rotate(45deg) scale(1);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-10vw, 110vh) rotate(405deg) scale(1.5);
+    opacity: 1;
+  }
+  55% {
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-10vw, 110vh) rotate(405deg) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes slashDiagonal2 {
+  0% {
+    transform: translate(-10vw, -10vh) rotate(-45deg) scale(1);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(110vw, 110vh) rotate(-405deg) scale(1.5);
+    opacity: 1;
+  }
+  55% {
+    opacity: 0;
+  }
+  100% {
+    transform: translate(110vw, 110vh) rotate(-405deg) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Potion animations - bubbling path */
+@keyframes bubblePath1 {
+  0% {
+    transform: translate(10vw, 110vh) scale(1);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  15% {
+    transform: translate(15vw, 80vh) scale(1.2);
+  }
+  30% {
+    transform: translate(25vw, 50vh) scale(0.9);
+  }
+  45% {
+    transform: translate(30vw, 30vh) scale(1.1);
+  }
+  60% {
+    transform: translate(40vw, 10vh) scale(0.95);
+  }
+  75% {
+    transform: translate(50vw, -10vh) scale(1.05);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(60vw, -20vh) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes bubblePath2 {
+  0% {
+    transform: translate(90vw, -10vh) scale(1);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  15% {
+    transform: translate(85vw, 20vh) scale(1.2);
+  }
+  30% {
+    transform: translate(75vw, 45vh) scale(0.9);
+  }
+  45% {
+    transform: translate(70vw, 65vh) scale(1.1);
+  }
+  60% {
+    transform: translate(60vw, 85vh) scale(0.95);
+  }
+  75% {
+    transform: translate(50vw, 105vh) scale(1.05);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(40vw, 120vh) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Heart animation - bouncing across */
+@keyframes heartBounce {
+  0% {
+    transform: translate(-10vw, 50vh) scale(1);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  20% {
+    transform: translate(20vw, 30vh) scale(1.3);
+  }
+  40% {
+    transform: translate(40vw, 60vh) scale(0.8);
+  }
+  60% {
+    transform: translate(70vw, 35vh) scale(1.2);
+  }
+  80% {
+    transform: translate(100vw, 55vh) scale(0.9);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(110vw, 50vh) scale(1);
+    opacity: 0;
+  }
 }
 
 @keyframes spin {
@@ -337,25 +761,155 @@
   animation: float 5.5s infinite ease-in-out;
 }
 
-/* Position the elements */
-#pixel-elements .pixel-star:nth-child(1) { top: 15%; left: 10%; animation-delay: 0.5s; }
-#pixel-elements .pixel-star:nth-child(2) { top: 25%; right: 15%; animation-delay: 1s; }
-#pixel-elements .pixel-star:nth-child(3) { top: 40%; left: 25%; animation-delay: 1.3s; }
-#pixel-elements .pixel-star:nth-child(4) { top: 10%; right: 30%; animation-delay: 0.8s; }
+/* Magical Trail Animations */
+@keyframes starTrail1 {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(-30px, 15px) scale(0.4);
+    opacity: 0;
+  }
+}
 
-#pixel-elements .pixel-potion:nth-child(5) { bottom: 20%; right: 10%; animation-delay: 0.7s; }
-#pixel-elements .pixel-potion:nth-child(6) { top: 35%; right: 25%; animation-delay: 1.2s; }
+@keyframes starTrail2 {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translate(-50px, 25px) scale(0.2);
+    opacity: 0;
+  }
+}
 
-#pixel-elements .pixel-sword:nth-child(7) { top: 30%; left: 20%; animation-delay: 1.5s; }
-#pixel-elements .pixel-sword:nth-child(8) { bottom: 25%; left: 30%; animation-delay: 0.9s; }
+@keyframes gemTrail1 {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.5;
+    background: radial-gradient(circle, rgba(80, 200, 120, 0.6) 0%, transparent 70%);
+  }
+  100% {
+    transform: translate(-20px, 10px) scale(0.5);
+    opacity: 0;
+  }
+}
 
-#pixel-elements .pixel-heart:nth-child(9) { bottom: 30%; left: 15%; animation-delay: 0.2s; }
-#pixel-elements .pixel-heart:nth-child(10) { top: 20%; left: 40%; animation-delay: 1.7s; }
+@keyframes gemTrail2 {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+    background: radial-gradient(circle, rgba(80, 200, 120, 0.4) 0%, transparent 70%);
+  }
+  100% {
+    transform: translate(-35px, 18px) scale(0.3);
+    opacity: 0;
+  }
+}
 
-#pixel-elements .pixel-gem:nth-child(11) { top: 15%; right: 40%; animation-delay: 0.4s; }
-#pixel-elements .pixel-gem:nth-child(12) { bottom: 15%; right: 25%; animation-delay: 1.1s; }
+@keyframes coinTrail1 {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.6;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.7) 0%, transparent 70%);
+  }
+  100% {
+    transform: translate(-25px, 0) scale(0.4);
+    opacity: 0;
+  }
+}
 
-#pixel-elements .pixel-coin:nth-child(13) { top: 45%; right: 15%; animation-delay: 0.6s; }
-#pixel-elements .pixel-coin:nth-child(14) { bottom: 40%; left: 10%; animation-delay: 1.4s; }
+@keyframes coinTrail2 {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.4;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.5) 0%, transparent 70%);
+  }
+  100% {
+    transform: translate(-40px, 0) scale(0.2);
+    opacity: 0;
+  }
+}
 
-#pixel-elements .pixel-key:nth-child(15) { top: 50%; left: 50%; animation-delay: 0.3s; }
+@keyframes swordTrail1 {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 0.5;
+    background: radial-gradient(ellipse 60% 30%, rgba(220, 220, 255, 0.6) 0%, transparent 70%);
+  }
+  100% {
+    transform: translate(-35px, -35px) scale(0.5) rotate(-45deg);
+    opacity: 0;
+  }
+}
+
+@keyframes swordTrail2 {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 0.3;
+    background: radial-gradient(ellipse 60% 30%, rgba(180, 180, 255, 0.4) 0%, transparent 70%);
+  }
+  100% {
+    transform: translate(-55px, -55px) scale(0.3) rotate(-45deg);
+    opacity: 0;
+  }
+}
+
+@keyframes potionTrail1 {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.5;
+    background: radial-gradient(circle, rgba(147, 112, 219, 0.6) 0%, transparent 70%);
+  }
+  50% {
+    transform: translate(-10px, -15px) scale(0.8);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translate(-15px, -25px) scale(0.4);
+    opacity: 0;
+  }
+}
+
+@keyframes potionTrail2 {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+    background: radial-gradient(circle, rgba(147, 112, 219, 0.4) 0%, transparent 70%);
+  }
+  50% {
+    transform: translate(-18px, -28px) scale(0.6);
+    opacity: 0.2;
+  }
+  100% {
+    transform: translate(-25px, -40px) scale(0.2);
+    opacity: 0;
+  }
+}
+
+@keyframes heartTrail1 {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.5;
+    background: radial-gradient(circle, rgba(255, 107, 107, 0.6) 0%, transparent 70%);
+  }
+  100% {
+    transform: translate(-20px, 10px) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes heartTrail2 {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+    background: radial-gradient(circle, rgba(255, 107, 107, 0.4) 0%, transparent 70%);
+  }
+  100% {
+    transform: translate(-35px, 18px) scale(0.3);
+    opacity: 0;
+  }
+}
+
+/* Old positioning rules removed - elements now use transform-based animations that move across the entire viewport */
