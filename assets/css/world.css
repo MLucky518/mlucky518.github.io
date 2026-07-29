@@ -170,10 +170,26 @@
   transform: scale(1.05);
 }
 
-/* The orbit animation itself lives in pixel-elements.css; this just sizes
-   the icons it carries around. */
+/* pixel-elements.css has an `orbit` keyframe, but its radius is hardcoded
+   (translateX(100px)) — so the ring stayed the same size even when the
+   container shrank, and the icons swung down into the title. Ours takes
+   the radius from a variable, so one value re-sizes the whole ring. */
+@keyframes orbit-ring {
+  0% {
+    transform: rotate(0deg) translateX(var(--orbit-radius)) rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg) translateX(var(--orbit-radius)) rotate(-360deg);
+  }
+}
+
+.intro-card {
+  --orbit-radius: 100px;
+}
+
 .tech-orbit-icon {
-  animation: orbit 20s linear infinite;
+  animation: orbit-ring 20s linear infinite;
 }
 
 .tech-orbit-icon .pixel-element {
@@ -327,8 +343,10 @@
 
 /* Short screens (landscape phones): tighten so it never needs scrolling. */
 @media (max-height: 720px) {
-  .intro-card { padding: 1.5rem; }
-  .avatar-wrapper { width: 104px; height: 104px; margin-bottom: 1.1rem; }
+  .intro-card { padding: 1.5rem; --orbit-radius: 74px; }
+  /* Bottom margin has to clear the ORBIT (radius + icon), not the portrait:
+     104/2 + ... vs 74 + 16 = 90px from center, i.e. ~38px past the avatar. */
+  .avatar-wrapper { width: 104px; height: 104px; margin: 1rem auto 3.25rem; }
   .tech-orbit-container { width: 150px; height: 150px; }
   .intro-eyebrow { margin-bottom: 0.9rem; }
   .intro-hint { display: none; }
