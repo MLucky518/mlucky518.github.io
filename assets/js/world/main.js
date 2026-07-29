@@ -1,10 +1,21 @@
-// The three essentials of every Three.js app:
+// ============================================================
+// THE WORLD — entry point
+// ============================================================
+// The three essentials of every Three.js app (from Step 2):
 //   1. A Scene  — the container holding everything (meshes, lights, fog)
 //   2. A Camera — the viewpoint the world is drawn from
 //   3. A Renderer — draws the scene from the camera's view onto a <canvas>, every frame
+//
+// This file is the conductor: it creates those three, then wires the
+// modules together — room.js (the set), controls.js (the player),
+// interact.js (the raycaster), ui.js (the DOM overlays).
+// ============================================================
 
 import * as THREE from 'three';
 import { PlayerControls } from './controls.js';
+import { buildRoom, ROOM } from './room.js';
+import { Interactions } from './interact.js';
+import { WorldUI } from './ui.js';
 
 // ---------- Renderer ----------
 const canvas = document.getElementById('world-canvas');
@@ -18,59 +29,104 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x121212); // matches the site's dark theme
 // Fog fades distant objects into the background color — cheap depth + atmosphere.
-scene.fog = new THREE.Fog(0x121212, 8, 30);
+// Tuned gently: the room is only ~18m across, we just want the far wall moody.
+scene.fog = new THREE.Fog(0x121212, 10, 26);
 
 // ---------- Camera ----------
 // PerspectiveCamera(fieldOfView, aspectRatio, nearClip, farClip)
-// Anything closer than `near` or farther than `far` isn't drawn.
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(0, 1.6, 5); // 1.6 = human eye height in meters; Three.js units = meters by convention
+// 1.6 = human eye height in meters (Three.js units = meters by convention).
+// Start near the south end, facing the blog wall (cameras look down -Z).
+camera.position.set(0, 1.6, 3.5);
 
-// ---------- Lights ----------
-// Without lights, standard materials render pure black.
-// Ambient = soft fill light from everywhere (no shadows, no direction).
-scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-// Directional = sun-like parallel rays from a direction.
-const sun = new THREE.DirectionalLight(0xffffff, 1.2);
-sun.position.set(3, 6, 4);
-scene.add(sun);
+// ---------- Boot ----------
+// Async because we fetch posts.json first — the room is BUILT FROM your
+// blog data (Jekyll generates /posts.json at build time; see posts.json).
+async function boot() {
+  let posts = [];
+  try {
+    const res = await fetch('/posts.json');
+    posts = (await res.json()).posts;
+  } catch (err) {
+    console.warn('posts.json unavailable — the gallery wall will be empty', err);
+  }
 
-// ---------- Floor ----------
-// A retro neon grid, synthwave style — fits the pixel/RPG aesthetic.
-const grid = new THREE.GridHelper(60, 60, 0xffd54f, 0x2d2d2d);
-scene.add(grid);
+  // The set: walls, lights, posters. Returns the interactive meshes.
+  const { hotspots } = buildRoom(scene, posts);
 
-// ---------- A test object ----------
-// Mesh = Geometry (the shape) + Material (the surface).
-const cube = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 1, 1),
-  new THREE.MeshStandardMaterial({ color: 0xffd54f, roughness: 0.4, metalness: 0.2 })
-);
-cube.position.set(0, 1, 0);
-scene.add(cube);
+  // The player. Bounds = room minus a margin so you stop AT walls, not in them.
+  const controls = new PlayerControls(camera, canvas, {
+    bounds: {
+      minX: -(ROOM.width / 2 - 0.7), maxX: ROOM.width / 2 - 0.7,
+      minZ: -(ROOM.depth / 2 - 0.7), maxZ: ROOM.depth / 2 - 0.7,
+    },
+  });
 
-// ---------- Controls (Step 3) ----------
-// The controls own the camera from here on: mouse sets its rotation,
-// WASD moves its position. See controls.js for the full walkthrough.
-const controls = new PlayerControls(camera, canvas);
+  const ui = new WorldUI();
 
-// Overlay wiring: clicking ENTER requests pointer lock; pressing Esc
-// releases it and the overlay comes back as a pause screen.
-const overlay = document.getElementById('intro-overlay');
-const reticle = document.getElementById('reticle');
-document.getElementById('enter-btn').addEventListener('click', () => controls.lock());
-controls.onLock = () => {
-  overlay.classList.add('hidden');
-  reticle.hidden = false;
-};
-controls.onUnlock = () => {
-  overlay.classList.remove('hidden');
-  reticle.hidden = true;
-};
+  // The raycaster, wired to the UI prompt and to real actions.
+  const interactions = new Interactions(camera, hotspots, {
+    onTargetChange: (action) => ui.setPrompt(action),
+    onActivate: (action) => {
+      if (action.type === 'post') ui.openPost(action.post);
+      else if (action.type === 'archive') ui.openArchive(posts);
+      else if (action.type === 'about') ui.openAbout();
+      else if (action.type === 'contact') ui.openContact();
+      else if (action.type === 'link') { window.location.href = action.href; return; }
+      // Reading uses the mouse (scrolling, links), so give the cursor back.
+      // ui.isOpen is already true here, which tells onUnlock below NOT to
+      // treat this as "pause" — that's the whole panel/pause dance.
+      document.exitPointerLock();
+    },
+  });
 
-// Dev helper: lets us poke at the world from the browser console,
-// e.g. __world.camera.position — handy for debugging.
-window.__world = { scene, camera, controls, renderer };
+  // --- The pointer-lock / overlay / panel dance ---
+  // Pointer lock can end three ways: Esc (pause), opening a panel (reading),
+  // or a failed re-lock. Only the first should show the pause overlay.
+  const overlay = document.getElementById('intro-overlay');
+  const reticle = document.getElementById('reticle');
+  document.getElementById('enter-btn').addEventListener('click', () => controls.lock());
+
+  controls.onLock = () => {
+    overlay.classList.add('hidden');
+    reticle.hidden = false;
+  };
+  controls.onUnlock = () => {
+    reticle.hidden = true;
+    ui.setPrompt(null);
+    if (!ui.isOpen) overlay.classList.remove('hidden'); // pause, not reading
+  };
+  // Closing the reader re-grabs the pointer (the close click is the
+  // user gesture browsers require). If the grab fails, controls.lock()
+  // falls back to showing the pause overlay.
+  ui.onClose = () => controls.lock();
+
+  // --- Activation inputs: E or click, only while walking ---
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'KeyE' && controls.isLocked) interactions.activate();
+    // Esc with the reader open: close it (browser Esc-unlock already
+    // happened when the reader opened, so this is our job).
+    if (e.code === 'Escape' && ui.isOpen) ui.close();
+  });
+  canvas.addEventListener('click', () => {
+    if (controls.isLocked) interactions.activate();
+  });
+
+  // Dev helper: poke at the world from the browser console.
+  window.__world = { scene, camera, controls, renderer, interactions, ui };
+
+  // ---------- The render loop ----------
+  // The heartbeat: runs ~60x/second. Each frame: update the world, then draw it.
+  // The clock gives us delta time (seconds since last frame) so motion is
+  // framerate-independent.
+  const clock = new THREE.Clock();
+  renderer.setAnimationLoop(() => {
+    const dt = clock.getDelta();
+    controls.update(dt);      // move the player...
+    interactions.update();    // ...check what they're aiming at...
+    renderer.render(scene, camera); // ...draw the frame
+  });
+}
 
 // ---------- Resize handling ----------
 // The camera's aspect ratio and the renderer's size must track the window,
@@ -81,16 +137,4 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// ---------- The render loop ----------
-// The heartbeat: runs ~60x/second. Each frame: update the world, then draw it.
-// The clock gives us delta time (seconds since last frame) so motion is
-// framerate-independent — a 120Hz monitor shouldn't spin the cube twice as fast.
-const clock = new THREE.Clock();
-
-renderer.setAnimationLoop(() => {
-  const dt = clock.getDelta();
-  controls.update(dt); // move the player first...
-  cube.rotation.y += dt * 0.8;
-  cube.rotation.x += dt * 0.3;
-  renderer.render(scene, camera); // ...then draw the frame from the new viewpoint
-});
+boot();

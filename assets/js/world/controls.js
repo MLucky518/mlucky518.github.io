@@ -78,8 +78,12 @@ export class PlayerControls {
   }
 
   // Must be called from a real user gesture (click) — browsers refuse otherwise.
+  // Can also REJECT even with a gesture (e.g. Chrome enforces a ~1.3s cooldown
+  // after each unlock). If it does, run onUnlock so the pause overlay appears
+  // instead of leaving the player in a dead un-locked state.
   lock() {
-    this.domElement.requestPointerLock();
+    const result = this.domElement.requestPointerLock();
+    if (result?.catch) result.catch(() => this.onUnlock());
   }
 
   #onMouseMove(e) {

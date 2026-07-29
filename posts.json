@@ -1,0 +1,21 @@
+---
+layout: null
+# STEP 4: the data bridge between Jekyll and the 3D world.
+# This file has front matter, so Jekyll processes the Liquid below and
+# serves the result at /posts.json. The world fetches it at runtime —
+# so new blog posts automatically become new posters in the room.
+---
+{
+  "posts": [
+    {%- for post in site.posts %}
+    {
+      "title": {{ post.title | jsonify }},
+      "date": {{ post.date | date: "%b %d, %Y" | jsonify }},
+      "url": {{ post.url | jsonify }},
+      "categories": {{ post.categories | jsonify }},
+      "excerpt": {{ post.excerpt | strip_html | strip_newlines | truncate: 200 | jsonify }},
+      "content": {{ post.content | jsonify }}
+    }{% unless forloop.last %},{% endunless %}
+    {%- endfor %}
+  ]
+}

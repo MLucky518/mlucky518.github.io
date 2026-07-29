@@ -6,6 +6,11 @@
   /* no scrollbars — the world IS the page */
   background: #121212;
   font-family: 'Outfit', system-ui, sans-serif;
+
+  /* One source of truth for the accent color. Every rule below derives
+     from this via var() and color-mix(), so re-theming the whole UI is a
+     one-line change. (The 3D side has its own copy in room.js — ACCENT.) */
+  --accent: #b388ff;
 }
 
 #world-canvas {
@@ -45,8 +50,8 @@
 .intro-card h1 {
   font-family: 'Press Start 2P', monospace;
   font-size: clamp(1.1rem, 4vw, 2rem);
-  color: #ffd54f;
-  text-shadow: 0 0 18px rgba(255, 213, 79, 0.45);
+  color: var(--accent);
+  text-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent);
   margin: 0 0 0.75rem;
 }
 
@@ -62,17 +67,17 @@
   font-family: 'Press Start 2P', monospace;
   font-size: 0.85rem;
   color: #121212;
-  background: #ffd54f;
+  background: var(--accent);
   border: none;
   padding: 1rem 2.2rem;
   cursor: pointer;
-  box-shadow: 0 0 24px rgba(255, 213, 79, 0.35);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 35%, transparent);
   transition: transform 0.15s, box-shadow 0.15s;
 }
 
 #enter-btn:hover {
   transform: scale(1.06);
-  box-shadow: 0 0 36px rgba(255, 213, 79, 0.6);
+  box-shadow: 0 0 36px color-mix(in srgb, var(--accent) 60%, transparent);
 }
 
 .intro-hint {
@@ -90,8 +95,216 @@
 }
 
 .intro-links a {
-  color: #ffd54f;
+  color: var(--accent);
   text-decoration: none;
+}
+
+/* GOTCHA: the `hidden` HTML attribute is only a browser-default
+   `display: none` — and author CSS like our `display: flex` below BEATS
+   browser defaults. Without this rule, "hidden" panels render anyway. */
+#interact-prompt[hidden],
+#reader-panel[hidden] {
+  display: none;
+}
+
+/* ---------- Interact prompt ("press E") ---------- */
+
+#interact-prompt {
+  position: fixed;
+  bottom: 12vh;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(18, 18, 18, 0.85);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  padding: 0.55rem 0.9rem;
+  border-radius: 4px;
+  z-index: 5;
+  pointer-events: none;
+  color: #e8e8e8;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+}
+
+.prompt-key {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.7rem;
+  color: #121212;
+  background: var(--accent);
+  padding: 0.35rem 0.45rem;
+  border-radius: 3px;
+}
+
+/* ---------- Reader panel (posts open here) ---------- */
+
+#reader-panel {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 10, 14, 0.7);
+  z-index: 20;
+}
+
+.reader-card {
+  position: relative;
+  width: min(700px, 92vw);
+  max-height: 84vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #17171f;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.7);
+  border-radius: 6px;
+}
+
+#reader-close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #a0a0a0;
+  font-size: 1rem;
+  padding: 0.3rem 0.55rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#reader-close:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+#reader-content {
+  overflow-y: auto;
+  padding: 2.2rem 2.4rem;
+  color: #d8d8d8;
+  font-family: 'Outfit', sans-serif;
+  line-height: 1.7;
+}
+
+/* Typography for the injected post HTML */
+#reader-content h1 {
+  font-size: 1.6rem;
+  color: #ffffff;
+  line-height: 1.3;
+  margin: 0.2rem 0 1rem;
+}
+
+#reader-content h2 {
+  font-size: 1.2rem;
+  color: #ffffff;
+  margin: 1.6rem 0 0.6rem;
+}
+
+#reader-content h3 {
+  font-size: 1.05rem;
+  color: #ffffff;
+  margin: 1.3rem 0 0.5rem;
+}
+
+#reader-content p {
+  margin: 0 0 1rem;
+}
+
+#reader-content a {
+  color: var(--accent);
+}
+
+#reader-content blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1rem 0;
+  padding: 0.3rem 0 0.3rem 1rem;
+  color: #a0a0a0;
+}
+
+#reader-content code {
+  background: #23232e;
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85em;
+}
+
+#reader-content pre {
+  background: #23232e;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+#reader-content img {
+  max-width: 100%;
+}
+
+#reader-content hr {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin: 1.5rem 0;
+}
+
+.reader-kicker {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+}
+
+.reader-tagline {
+  color: #a0a0a0;
+  font-style: italic;
+}
+
+/* ---------- Archive list (all posts) ---------- */
+
+.archive-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.archive-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  width: 100%;
+  text-align: left;
+  background: #1d1d27;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.archive-item:hover {
+  border-color: var(--accent);
+  background: #232330;
+}
+
+.archive-title {
+  color: #ffffff;
+  font-size: 0.95rem;
+}
+
+.archive-date {
+  color: #a0a0a0;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.reader-footer {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* ---------- Reticle (center-screen aiming dot) ---------- */

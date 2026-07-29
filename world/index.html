@@ -47,6 +47,21 @@
   <!-- Center-screen dot; becomes the "what am I aiming at" indicator in Step 4 -->
   <div id="reticle" hidden></div>
 
+  <!-- "Press E" hint, driven by the raycaster (interact.js) -->
+  <div id="interact-prompt" hidden>
+    <span class="prompt-key">E</span>
+    <span id="prompt-label"></span>
+  </div>
+
+  <!-- The reader: blog posts open here, as real scrollable HTML on top of
+       the world. Text belongs in the DOM, not in 3D — see ui.js. -->
+  <div id="reader-panel" hidden>
+    <div class="reader-card">
+      <button id="reader-close" aria-label="Close">✕</button>
+      <div id="reader-content"></div>
+    </div>
+  </div>
+
   <noscript>
     <p>This page is a 3D experience and needs JavaScript.
       Visit the <a href="/blog/">blog</a>, <a href="/about/">about</a>, or <a href="/contact/">contact</a> pages instead.</p>
