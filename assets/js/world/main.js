@@ -120,13 +120,21 @@ async function boot() {
   const overlay = document.getElementById('intro-overlay');
   const reticle = document.getElementById('reticle');
   const eyebrow = document.getElementById('intro-eyebrow');
+  // Touch devices have no pointer lock (looking) and no keyboard (walking),
+  // so first person would be a photo you can't control. 3D is locked out
+  // entirely on those — not just hidden. One flag, checked in setMode, so
+  // EVERY route in (button, corner toggle, M key) is closed at the source.
+  const can3d = !window.matchMedia('(pointer: coarse)').matches;
+
   let mode = '3d';
   let entered = false; // false = still on the title screen, camera on its slow drift
+  let spawned3d = false; // has the player ever stood up in the 3D view?
 
   // A pure view switch. Deliberately does NOT touch the title screen —
   // that's enterWorld's job. Keeping "which view" and "playing yet?"
   // independent is what makes both states predictable.
   function setMode(m) {
+    if (m === '3d' && !can3d) return; // touch device: 2D is the only view
     mode = m;
     canvas.style.display = m === '3d' ? '' : 'none';
     map2d.setActive(m === '2d');
@@ -136,25 +144,33 @@ async function boot() {
       reticle.hidden = true;
       if (document.pointerLockElement) document.exitPointerLock();
     } else if (entered) {
+      // First time standing up in 3D? Take the body out of the cinematic
+      // camera. (Without this, entering via 2D and then pressing M leaves
+      // you floating at the title-drift height instead of at eye level.)
+      if (!spawned3d) spawn3d();
       // Mouse-look only matters once you're actually playing. The click or
       // keypress that got us here counts as the gesture pointer lock needs.
       controls.lock();
     }
   }
 
+  // Put the player on their feet at the room's south end, looking north.
+  function spawn3d() {
+    camera.position.set(0, 1.6, 4.5);
+    controls.yaw = 0;
+    controls.pitch = 0;
+    camera.rotation.set(0, 0, 0);
+    spawned3d = true;
+  }
+
   // Leave the title screen and start playing in view `m`.
   function enterWorld(m) {
     entered = true;
     overlay.classList.add('hidden');
-    modeBtn.hidden = false;
-    if (m === '3d') {
-      // Land on a sensible spawn — the title drift left the camera
-      // wherever its orbit happened to be.
-      camera.position.set(0, 1.6, 4.5);
-      controls.yaw = 0;
-      controls.pitch = 0;
-      camera.rotation.set(0, 0, 0);
-    }
+    modeBtn.hidden = !can3d; // nothing to toggle between on a touch device
+    // Land on a sensible spawn — the title drift left the camera wherever
+    // its orbit happened to be.
+    if (m === '3d') spawn3d();
     setMode(m);
   }
 
@@ -189,13 +205,17 @@ async function boot() {
   // falls back to showing the pause overlay. 2D never holds the pointer.
   ui.onClose = () => { if (mode === '3d') controls.lock(); };
 
-  // Phones and tablets: walking in 3D needs a keyboard and looking needs
-  // pointer lock — neither exists on touch. So offer 2D only, rather than
-  // handing them a first-person view they can't actually control.
-  if (window.matchMedia('(pointer: coarse)').matches) {
+  // Touch devices: 2D is the whole experience. Drop the 3D button, promote
+  // 2D to primary, and swap the keyboard legend for touch instructions.
+  if (!can3d) {
     setMode('2d');
+    const btn2d = document.getElementById('enter-2d-btn');
     document.getElementById('enter-btn').hidden = true;
-    document.getElementById('enter-2d-btn').classList.add('primary');
+    btn2d.classList.add('primary');
+    btn2d.querySelector('.start-label').textContent = 'ENTER THE ROOM';
+    btn2d.querySelector('.start-sub').textContent = 'top-down · play as a cat';
+    document.querySelector('.intro-hint').textContent =
+      'tap to walk · tap the glowing spots to open them';
   }
 
   // --- Activation inputs: E or click, only while walking ---
@@ -205,7 +225,7 @@ async function boot() {
       if (mode === '3d' && controls.isLocked) interactions.activate();
       else if (mode === '2d') map2d.activate();
     }
-    if (e.code === 'KeyM' && !uiBusy) {
+    if (e.code === 'KeyM' && !uiBusy && can3d) {
       const next = mode === '3d' ? '2d' : '3d';
       if (entered) setMode(next); else enterWorld(next);
     }
