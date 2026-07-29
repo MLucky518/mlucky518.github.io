@@ -167,7 +167,7 @@ export class WorldUI {
     this.#open(`
       <p class="reader-kicker">ABOUT</p>
       <h1>Michael Luck</h1>
-      <p class="reader-tagline">Seeker of Knowledge · Full-Stack Developer · Level 34</p>
+      <p class="reader-tagline">Seeker of Knowledge · Full-Stack Developer · Level 35</p>
       <p>I've had an on and off relationship with hope throughout my life. Growing up wasn't
       easy — poverty, hardship, and a lot of reasons to give up. But I was always a smart kid,
       and that gave me hope for a future that was different.</p>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Michael Luck — Full-Stack Developer</title>
+  <meta name="description"
+    content="Michael Luck, full-stack developer. Walk through my work in an interactive room — blog posts, projects, and a conversation with the 3D me.">
+  <link rel="icon" type="image/png" href="/assets/images/logo-light.png">
+
+  <!-- Same pixel font the rest of the site uses -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;600&display=swap"
+    rel="stylesheet">
+
+  <!-- pixel-elements.css carries the tech-icon sprites and the orbit
+       animation reused from the classic landing page. It's self-contained
+       (no CSS variables, no layout rules), so it's safe to drop in here. -->
+  <link rel="stylesheet" href="/assets/css/pixel-elements.css">
+  <link rel="stylesheet" href="/assets/css/world.css">
+
+  <!-- Import map: tells the browser where to fetch "three" from when our modules import it.
+       No bundler needed — this is native browser functionality. -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+
+<body class="world-page">
+  <!-- Three.js draws into this canvas. Everything else on this page is a DOM overlay on top of it. -->
+  <canvas id="world-canvas"></canvas>
+
+  <!-- The 2D top-down view draws here instead when 2D mode is on (M key).
+       Same world, same data — see mode2d.js. -->
+  <canvas id="world-canvas-2d" hidden></canvas>
+
+  <!-- Mode switch. Hidden until you're past the title screen, which has
+       its own explicit button for each view. -->
+  <button id="mode-toggle" hidden>2D VIEW [M]</button>
+
+  <!-- TITLE SCREEN. Pointer lock can only start from a real user click, so
+       the 3D view can never auto-run — which is why every browser FPS opens
+       on a screen like this. The live room drifts past behind it. -->
+  <div id="intro-overlay">
+    <div class="intro-card">
+      <!-- Empty by design: CSS hides it while blank, and main.js fills it
+           with "PAUSED" when Esc brings this screen back mid-game. -->
+      <p class="intro-eyebrow" id="intro-eyebrow"></p>
+
+      <!-- The orbiting avatar, carried over from the classic landing page -->
+      <div class="avatar-wrapper">
+        <div class="tech-orbit-container">
+          <div class="tech-orbit-icon" style="animation-delay: 0s;"><i class="pixel-element pixel-js"></i></div>
+          <div class="tech-orbit-icon" style="animation-delay: -2.5s;"><i class="pixel-element pixel-react"></i></div>
+          <div class="tech-orbit-icon" style="animation-delay: -5s;"><i class="pixel-element pixel-ruby"></i></div>
+          <div class="tech-orbit-icon" style="animation-delay: -7.5s;"><i class="pixel-element pixel-python"></i></div>
+          <div class="tech-orbit-icon" style="animation-delay: -10s;"><i class="pixel-element pixel-aws"></i></div>
+          <div class="tech-orbit-icon" style="animation-delay: -12.5s;"><i class="pixel-element pixel-ollama"></i></div>
+          <div class="tech-orbit-icon" style="animation-delay: -15s;"><i class="pixel-element pixel-mysql"></i></div>
+          <div class="tech-orbit-icon" style="animation-delay: -17.5s;"><i class="pixel-element pixel-postgresql"></i>
+          </div>
+        </div>
+        <img src="/assets/images/me-good.png" alt="Michael Luck" class="avatar-image">
+      </div>
+
+      <h1 class="intro-title">MICHAEL LUCK</h1>
+      <p class="intro-sub">FULL-STACK DEVELOPER</p>
+      <p class="intro-badge">LVL 35</p>
+
+      <div class="intro-actions">
+        <button id="enter-btn" class="start-btn primary">
+          <span class="start-icon">▶</span>
+          <span class="start-text">
+            <span class="start-label">ENTER THE ROOM</span>
+            <span class="start-sub">first person · walk around</span>
+          </span>
+        </button>
+        <button id="enter-2d-btn" class="start-btn">
+          <span class="start-icon">▣</span>
+          <span class="start-text">
+            <span class="start-label">2D MODE</span>
+            <span class="start-sub">top-down · play as a cat</span>
+          </span>
+        </button>
+      </div>
+
+      <p class="intro-hint">
+        <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move
+        <kbd>E</kbd> interact
+        <kbd>M</kbd> switch view
+        <kbd>ESC</kbd> pause
+      </p>
+
+      <p class="intro-links">
+        <a href="/classic/">classic site</a> ·
+        <a href="/blog/">blog</a> ·
+        <a href="/about/">about</a> ·
+        <a href="/contact/">contact</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Center-screen dot; the "what am I aiming at" indicator -->
+  <div id="reticle" hidden></div>
+
+  <!-- "Press E" hint, driven by the raycaster (interact.js) -->
+  <div id="interact-prompt" hidden>
+    <span class="prompt-key">E</span>
+    <span id="prompt-label"></span>
+  </div>
+
+  <!-- RPG dialogue box: talking to the avatar happens here. Choices are
+       picked with number keys so pointer lock never has to release. -->
+  <div id="dialogue-box" hidden>
+    <p id="dialogue-name">MIKE</p>
+    <p id="dialogue-text"></p>
+    <div id="dialogue-options"></div>
+  </div>
+
+  <!-- The reader: blog posts open here, as real scrollable HTML on top of
+       the world. Text belongs in the DOM, not in 3D — see ui.js. -->
+  <div id="reader-panel" hidden>
+    <div class="reader-card">
+      <button id="reader-close" aria-label="Close">✕</button>
+      <div id="reader-content"></div>
+    </div>
+  </div>
+
+  <noscript>
+    <p>This page is an interactive 3D experience and needs JavaScript.
+      Visit the <a href="/classic/">classic site</a>, <a href="/blog/">blog</a>,
+      <a href="/about/">about</a>, or <a href="/contact/">contact</a> pages instead.</p>
+  </noscript>
+
+  <script type="module" src="/assets/js/world/main.js"></script>
+</body>
+
+</html>

@@ -10,7 +10,7 @@ permalink: /about/
       <img src="{{ '/assets/images/me.png' | relative_url }}" alt="Michael Luck">
     </div>
     <h1>Michael Luck</h1>
-    <p class="about-tagline">Seeker of Knowledge · Full-Stack Developer · Level 34</p>
+    <p class="about-tagline">Seeker of Knowledge · Full-Stack Developer · Level 35</p>
     <blockquote class="about-quote">"The more I learn, the more I realize I know nothing." — Socrates</blockquote>
   </div>
 

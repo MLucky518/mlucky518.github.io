@@ -3,79 +3,14 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <title>The World | Michael Luck</title>
-  <meta name="description" content="Walk through Michael Luck's portfolio in 3D.">
-
-  <!-- Same pixel font the rest of the site uses -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;600&display=swap"
-    rel="stylesheet">
-
-  <link rel="stylesheet" href="/assets/css/world.css">
-
-  <!-- Import map: tells the browser where to fetch "three" from when our modules import it.
-       No bundler needed — this is native browser functionality. -->
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
-      }
-    }
-  </script>
+  <title>Redirecting…</title>
+  <!-- The world moved to the homepage. This stub keeps old /world/ links alive. -->
+  <link rel="canonical" href="/">
+  <meta http-equiv="refresh" content="0; url=/">
 </head>
 
-<body class="world-page">
-  <!-- Three.js draws into this canvas. Everything else on this page is a DOM overlay on top of it. -->
-  <canvas id="world-canvas"></canvas>
-
-  <!-- Pointer lock needs a real user click to start, so every browser FPS
-       has a "click to play" screen. This is ours. Esc brings it back. -->
-  <div id="intro-overlay">
-    <div class="intro-card">
-      <h1>MICHAEL LUCK</h1>
-      <p class="intro-sub">— PORTFOLIO WORLD —</p>
-      <button id="enter-btn">&#9654; ENTER</button>
-      <p class="intro-hint">WASD move &nbsp;·&nbsp; mouse look &nbsp;·&nbsp; SHIFT run &nbsp;·&nbsp; ESC pause</p>
-      <p class="intro-links">prefer 2D? <a href="/blog/">blog</a> · <a href="/about/">about</a> · <a
-          href="/contact/">contact</a></p>
-    </div>
-  </div>
-
-  <!-- Center-screen dot; becomes the "what am I aiming at" indicator in Step 4 -->
-  <div id="reticle" hidden></div>
-
-  <!-- "Press E" hint, driven by the raycaster (interact.js) -->
-  <div id="interact-prompt" hidden>
-    <span class="prompt-key">E</span>
-    <span id="prompt-label"></span>
-  </div>
-
-  <!-- RPG dialogue box: talking to the avatar happens here. Choices are
-       picked with number keys so pointer lock never has to release. -->
-  <div id="dialogue-box" hidden>
-    <p id="dialogue-name">MIKE</p>
-    <p id="dialogue-text"></p>
-    <div id="dialogue-options"></div>
-  </div>
-
-  <!-- The reader: blog posts open here, as real scrollable HTML on top of
-       the world. Text belongs in the DOM, not in 3D — see ui.js. -->
-  <div id="reader-panel" hidden>
-    <div class="reader-card">
-      <button id="reader-close" aria-label="Close">✕</button>
-      <div id="reader-content"></div>
-    </div>
-  </div>
-
-  <noscript>
-    <p>This page is a 3D experience and needs JavaScript.
-      Visit the <a href="/blog/">blog</a>, <a href="/about/">about</a>, or <a href="/contact/">contact</a> pages instead.</p>
-  </noscript>
-
-  <script type="module" src="/assets/js/world/main.js"></script>
+<body>
+  <p>The world is now the front door — <a href="/">continue to it</a>.</p>
 </body>
 
 </html>

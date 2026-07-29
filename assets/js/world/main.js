@@ -17,6 +17,7 @@ import { buildRoom, ROOM } from './room.js';
 import { decorateRoom } from './props.js';
 import { loadAvatar } from './avatar.js';
 import { DIALOGUE } from './dialogue.js';
+import { WorldMap2D } from './mode2d.js';
 import { Interactions } from './interact.js';
 import { WorldUI } from './ui.js';
 
@@ -88,31 +89,86 @@ async function boot() {
   ui.onDialogueStart = () => { controls.frozen = true; };
   ui.onDialogueEnd = () => { controls.frozen = false; };
 
+  // ONE action dispatcher for BOTH views: the 3D raycaster and the 2D
+  // map both funnel their hotspot actions through here.
+  const runAction = (action) => {
+    if (action.type === 'post') ui.openPost(action.post);
+    else if (action.type === 'archive') ui.openArchive(posts);
+    else if (action.type === 'projects') ui.openProjects();
+    else if (action.type === 'about') ui.openAbout();
+    else if (action.type === 'contact') ui.openContact();
+    else if (action.type === 'link') { window.location.href = action.href; return; }
+    else if (action.type === 'talk') { ui.openDialogue(DIALOGUE); return; } // keeps pointer lock!
+    // Reading uses the mouse (scrolling, links), so give the cursor back.
+    // ui.isOpen is already true here, which tells onUnlock below NOT to
+    // treat this as "pause" — that's the whole panel/pause dance.
+    if (mode === '3d') document.exitPointerLock();
+  };
+
   // The raycaster, wired to the UI prompt and to real actions.
   const interactions = new Interactions(camera, hotspots, {
     onTargetChange: (action) => ui.setPrompt(action),
-    onActivate: (action) => {
-      if (action.type === 'post') ui.openPost(action.post);
-      else if (action.type === 'archive') ui.openArchive(posts);
-      else if (action.type === 'projects') ui.openProjects();
-      else if (action.type === 'about') ui.openAbout();
-      else if (action.type === 'contact') ui.openContact();
-      else if (action.type === 'link') { window.location.href = action.href; return; }
-      else if (action.type === 'talk') { ui.openDialogue(DIALOGUE); return; } // keeps pointer lock!
-      // Reading uses the mouse (scrolling, links), so give the cursor back.
-      // ui.isOpen is already true here, which tells onUnlock below NOT to
-      // treat this as "pause" — that's the whole panel/pause dance.
-      document.exitPointerLock();
-    },
+    onActivate: runAction,
+  });
+
+  // --- The 2D top-down view (M key) — same room, played as a cat ---
+  const map2d = new WorldMap2D({
+    canvas: document.getElementById('world-canvas-2d'),
+    posts, ui, onAction: runAction,
+  });
+  const modeBtn = document.getElementById('mode-toggle');
+  const overlay = document.getElementById('intro-overlay');
+  const reticle = document.getElementById('reticle');
+  const eyebrow = document.getElementById('intro-eyebrow');
+  let mode = '3d';
+  let entered = false; // false = still on the title screen, camera on its slow drift
+
+  // A pure view switch. Deliberately does NOT touch the title screen —
+  // that's enterWorld's job. Keeping "which view" and "playing yet?"
+  // independent is what makes both states predictable.
+  function setMode(m) {
+    mode = m;
+    canvas.style.display = m === '3d' ? '' : 'none';
+    map2d.setActive(m === '2d');
+    modeBtn.textContent = m === '3d' ? '2D VIEW [M]' : '3D VIEW [M]';
+    ui.setPrompt(null);
+    if (m === '2d') {
+      reticle.hidden = true;
+      if (document.pointerLockElement) document.exitPointerLock();
+    } else if (entered) {
+      // Mouse-look only matters once you're actually playing. The click or
+      // keypress that got us here counts as the gesture pointer lock needs.
+      controls.lock();
+    }
+  }
+
+  // Leave the title screen and start playing in view `m`.
+  function enterWorld(m) {
+    entered = true;
+    overlay.classList.add('hidden');
+    modeBtn.hidden = false;
+    if (m === '3d') {
+      // Land on a sensible spawn — the title drift left the camera
+      // wherever its orbit happened to be.
+      camera.position.set(0, 1.6, 4.5);
+      controls.yaw = 0;
+      controls.pitch = 0;
+      camera.rotation.set(0, 0, 0);
+    }
+    setMode(m);
+  }
+
+  document.getElementById('enter-btn').addEventListener('click', () => enterWorld('3d'));
+  document.getElementById('enter-2d-btn').addEventListener('click', () => enterWorld('2d'));
+  modeBtn.addEventListener('click', () => {
+    const next = mode === '3d' ? '2d' : '3d';
+    if (entered) setMode(next); else enterWorld(next);
+    modeBtn.blur(); // else SPACE/ENTER would re-trigger it mid-game
   });
 
   // --- The pointer-lock / overlay / panel dance ---
   // Pointer lock can end three ways: Esc (pause), opening a panel (reading),
   // or a failed re-lock. Only the first should show the pause overlay.
-  const overlay = document.getElementById('intro-overlay');
-  const reticle = document.getElementById('reticle');
-  document.getElementById('enter-btn').addEventListener('click', () => controls.lock());
-
   controls.onLock = () => {
     overlay.classList.add('hidden');
     reticle.hidden = false;
@@ -121,26 +177,51 @@ async function boot() {
     reticle.hidden = true;
     ui.setPrompt(null);
     if (ui.isDialogueOpen) ui.closeDialogue(); // Esc mid-conversation = walk away
-    if (!ui.isOpen) overlay.classList.remove('hidden'); // pause, not reading
+    // The pause screen is the title screen wearing a different hat — only
+    // in 3D (2D never holds the pointer) and only once you've entered.
+    if (!ui.isOpen && mode === '3d' && entered) {
+      eyebrow.textContent = '❚❚ PAUSED';
+      overlay.classList.remove('hidden');
+    }
   };
   // Closing the reader re-grabs the pointer (the close click is the
   // user gesture browsers require). If the grab fails, controls.lock()
-  // falls back to showing the pause overlay.
-  ui.onClose = () => controls.lock();
+  // falls back to showing the pause overlay. 2D never holds the pointer.
+  ui.onClose = () => { if (mode === '3d') controls.lock(); };
+
+  // Phones and tablets: walking in 3D needs a keyboard and looking needs
+  // pointer lock — neither exists on touch. So offer 2D only, rather than
+  // handing them a first-person view they can't actually control.
+  if (window.matchMedia('(pointer: coarse)').matches) {
+    setMode('2d');
+    document.getElementById('enter-btn').hidden = true;
+    document.getElementById('enter-2d-btn').classList.add('primary');
+  }
 
   // --- Activation inputs: E or click, only while walking ---
   window.addEventListener('keydown', (e) => {
-    if (e.code === 'KeyE' && controls.isLocked && !ui.isDialogueOpen) interactions.activate();
+    const uiBusy = ui.isOpen || ui.isDialogueOpen;
+    if (e.code === 'KeyE' && !uiBusy) {
+      if (mode === '3d' && controls.isLocked) interactions.activate();
+      else if (mode === '2d') map2d.activate();
+    }
+    if (e.code === 'KeyM' && !uiBusy) {
+      const next = mode === '3d' ? '2d' : '3d';
+      if (entered) setMode(next); else enterWorld(next);
+    }
     // Esc with the reader open: close it (browser Esc-unlock already
     // happened when the reader opened, so this is our job).
-    if (e.code === 'Escape' && ui.isOpen) ui.close();
+    if (e.code === 'Escape') {
+      if (ui.isOpen) ui.close();
+      else if (ui.isDialogueOpen) ui.closeDialogue(); // 2D has no pointer-unlock to do it
+    }
   });
   canvas.addEventListener('click', () => {
     if (controls.isLocked) interactions.activate();
   });
 
   // Dev helper: poke at the world from the browser console.
-  window.__world = { scene, camera, controls, renderer, interactions, ui };
+  window.__world = { scene, camera, controls, renderer, interactions, ui, map2d, setMode, enterWorld };
 
   // ---------- The render loop ----------
   // The heartbeat: runs ~60x/second. Each frame: update the world, then draw it.
@@ -148,11 +229,26 @@ async function boot() {
   // framerate-independent.
   const clock = new THREE.Clock();
   renderer.setAnimationLoop(() => {
-    const dt = clock.getDelta();
-    controls.update(dt);      // move the player...
-    interactions.update();    // ...check what they're aiming at...
-    if (avatar) avatar.update(dt, camera); // ...let Mike notice them...
-    renderer.render(scene, camera); // ...draw the frame
+    // Clamp dt: when a tab is backgrounded, rAF pauses — and the first
+    // frame back reports the WHOLE gap (seconds!). Unclamped, that one
+    // huge step launches physics across the room. Every game does this.
+    const dt = Math.min(clock.getDelta(), 0.1);
+    if (mode === '3d') {
+      if (entered) {
+        controls.update(dt);      // move the player...
+        interactions.update();    // ...check what they're aiming at...
+      } else {
+        // Title screen: a slow cinematic orbit, so the room sells itself
+        // behind the menu instead of sitting there frozen.
+        const t = clock.elapsedTime * 0.08;
+        camera.position.set(Math.sin(t) * 6.5, 2.4, Math.cos(t) * 4 + 0.5);
+        camera.lookAt(0, 1.9, -3.5);
+      }
+      if (avatar) avatar.update(dt, camera); // ...let Mike notice them...
+      renderer.render(scene, camera); // ...draw the frame
+    } else {
+      map2d.update(dt);         // the whole 2D game runs in here
+    }
   });
 }
 

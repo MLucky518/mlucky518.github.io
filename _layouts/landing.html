@@ -68,7 +68,7 @@
 
         <div class="xp-bar-container animate fade-in delay-400">
           <!-- XP bar label -->
-          <div class="xp-label">LVL 34</div>
+          <div class="xp-label">LVL {{ page.hero.level }}</div>
 
           <!-- Pixel art decorations for XP bar -->
           <div class="pixel-element pixel-star"
@@ -85,12 +85,12 @@
           <!-- XP bar with notches - showing progress toward age 35 -->
           <div class="xp-bar">
             <div class="xp-notches"></div>
-            <div class="xp-fill" style="--width: 29%"></div>
+            <div class="xp-fill" style="--width: {{ page.hero.xp_percent }}%"></div>
             <div class="xp-glow"></div>
           </div>
 
           <!-- Next level indicator -->
-          <div class="next-level">LVL 35</div>
+          <div class="next-level">LVL {{ page.hero.next_level }}</div>
         </div>
 
         <!-- CTA Removed -->
@@ -122,6 +122,7 @@
           </div>
           <nav>
             <ul>
+              <li><a href="{{ '/' | relative_url }}" class="nav-link">3D World</a></li>
               <li><a href="{{ '/blog' | relative_url }}" class="nav-link">Blog</a></li>
               <li><a href="{{ '/about' | relative_url }}" class="nav-link">About</a></li>
               <li><a href="{{ '/contact' | relative_url }}" class="nav-link">Contact</a></li>

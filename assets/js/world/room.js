@@ -274,7 +274,7 @@ export function buildRoom(scene, posts) {
   door.position.set(0, 1.3, D / 2 - 0.06);
   scene.add(door);
   makeSign(scene, 'EXIT', new THREE.Vector3(0, 3, D / 2 - 0.05), Math.PI, 0.7);
-  door.userData.action = { type: 'link', href: '/', label: 'leave to the classic site' };
+  door.userData.action = { type: 'link', href: '/classic/', label: 'leave to the classic site' };
   door.userData.highlightMesh = door;
   hotspots.push(door);
 
