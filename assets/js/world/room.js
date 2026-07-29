@@ -257,56 +257,14 @@ export function buildRoom(scene, posts) {
     action: { type: 'archive', label: 'browse all ' + posts.length + ' posts' },
   });
 
-  // --- East wall: about ---
-  makeSign(scene, 'ABOUT', new THREE.Vector3(W / 2 - 0.05, 3.3, 0), -Math.PI / 2);
-  makePoster(scene, hotspots, {
-    texture: canvasTexture(512, 680, (ctx, w, h) => {
-      ctx.fillStyle = '#191922';
-      ctx.fillRect(0, 0, w, h);
-      ctx.strokeStyle = ACCENT_CSS;
-      ctx.lineWidth = 6;
-      ctx.strokeRect(14, 14, w - 28, h - 28);
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 52px monospace';
-      ctx.fillText('MICHAEL', w / 2, 250);
-      ctx.fillText('LUCK', w / 2, 320);
-      ctx.fillStyle = '#a0a0a0';
-      ctx.font = '26px monospace';
-      ctx.fillText('LVL 34 FULL-STACK DEV', w / 2, 400);
-      ctx.fillStyle = ACCENT_CSS;
-      ctx.font = 'bold 26px monospace';
-      ctx.fillText('▶ MY STORY', w / 2, h - 60);
-    }),
-    position: new THREE.Vector3(W / 2 - 0.06, 1.9, 0),
-    rotationY: -Math.PI / 2,
-    action: { type: 'about', label: 'my story' },
-  });
+  // --- East wall: Mike's corner ---
+  // Nothing on the wall here — the avatar standing at his desk IS the
+  // about section (walk up and talk to him).
 
-  // --- West wall: contact ---
-  makeSign(scene, 'CONTACT', new THREE.Vector3(-W / 2 + 0.05, 3.3, 0), Math.PI / 2);
-  makePoster(scene, hotspots, {
-    texture: canvasTexture(512, 680, (ctx, w, h) => {
-      ctx.fillStyle = '#191922';
-      ctx.fillRect(0, 0, w, h);
-      ctx.strokeStyle = ACCENT_CSS;
-      ctx.lineWidth = 6;
-      ctx.strokeRect(14, 14, w - 28, h - 28);
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 48px monospace';
-      ctx.fillText('SAY HELLO', w / 2, 270);
-      ctx.fillStyle = '#a0a0a0';
-      ctx.font = '24px monospace';
-      ctx.fillText('email · github · twitter', w / 2, 340);
-      ctx.fillStyle = ACCENT_CSS;
-      ctx.font = 'bold 26px monospace';
-      ctx.fillText('▶ GET IN TOUCH', w / 2, h - 60);
-    }),
-    position: new THREE.Vector3(-W / 2 + 0.06, 1.9, 0),
-    rotationY: Math.PI / 2,
-    action: { type: 'contact', label: 'get in touch' },
-  });
+  // --- West wall: the lounge ---
+  // No poster — the radio on the coffee table is the contact hotspot.
+  // The neon sign above the sofa points people at it.
+  makeSign(scene, 'CONTACT', new THREE.Vector3(-W / 2 + 0.05, 3.3, 1.9), Math.PI / 2, 0.8);
 
   // --- South wall: the exit door back to the classic site ---
   const door = new THREE.Mesh(

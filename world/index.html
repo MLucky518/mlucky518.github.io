@@ -53,6 +53,14 @@
     <span id="prompt-label"></span>
   </div>
 
+  <!-- RPG dialogue box: talking to the avatar happens here. Choices are
+       picked with number keys so pointer lock never has to release. -->
+  <div id="dialogue-box" hidden>
+    <p id="dialogue-name">MIKE</p>
+    <p id="dialogue-text"></p>
+    <div id="dialogue-options"></div>
+  </div>
+
   <!-- The reader: blog posts open here, as real scrollable HTML on top of
        the world. Text belongs in the DOM, not in 3D — see ui.js. -->
   <div id="reader-panel" hidden>

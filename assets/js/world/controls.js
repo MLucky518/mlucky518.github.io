@@ -49,6 +49,14 @@ export class PlayerControls {
     // will flip this off later — there's no pointer lock on touch screens.
     this.requiresLock = opts.requiresLock ?? true;
 
+    // Furniture collision boxes ({minX,maxX,minZ,maxZ}), already inflated
+    // by the player radius. Filled in by main.js once the props load.
+    this.colliders = [];
+
+    // Freeze = keep looking around, but no walking. Used during dialogue
+    // so you stay planted in front of the person you're talking to.
+    this.frozen = false;
+
     // Hooks the page can use to show/hide the "click to enter" overlay.
     this.onLock = () => { };
     this.onUnlock = () => { };
@@ -103,8 +111,8 @@ export class PlayerControls {
 
   // Called every frame from the render loop. dt = seconds since last frame.
   update(dt) {
-    if (this.requiresLock && !this.isLocked) {
-      this.velocity.set(0, 0, 0); // hard stop while paused
+    if ((this.requiresLock && !this.isLocked) || this.frozen) {
+      this.velocity.set(0, 0, 0); // hard stop while paused or in dialogue
       return;
     }
 
@@ -142,5 +150,24 @@ export class PlayerControls {
     // 5) Collision, v1: clamp to the room bounds.
     this.camera.position.x = Math.max(this.bounds.minX, Math.min(this.bounds.maxX, this.camera.position.x));
     this.camera.position.z = Math.max(this.bounds.minZ, Math.min(this.bounds.maxZ, this.camera.position.z));
+
+    // 6) Collision, v2: furniture. For each box we're inside, push out
+    //    through the NEAREST face (smallest penetration depth). This is
+    //    the classic "AABB resolve" — it's why you slide smoothly along
+    //    a desk instead of stopping dead when you brush it.
+    const p = this.camera.position;
+    for (const c of this.colliders) {
+      if (p.x > c.minX && p.x < c.maxX && p.z > c.minZ && p.z < c.maxZ) {
+        const pushLeft = p.x - c.minX;   // distance to escape through each face
+        const pushRight = c.maxX - p.x;
+        const pushNear = p.z - c.minZ;
+        const pushFar = c.maxZ - p.z;
+        const min = Math.min(pushLeft, pushRight, pushNear, pushFar);
+        if (min === pushLeft) p.x = c.minX;
+        else if (min === pushRight) p.x = c.maxX;
+        else if (min === pushNear) p.z = c.minZ;
+        else p.z = c.maxZ;
+      }
+    }
   }
 }

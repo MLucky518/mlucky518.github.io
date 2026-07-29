@@ -16,6 +16,23 @@ export class WorldUI {
     this.promptLabel = document.getElementById('prompt-label');
     this.onClose = () => { };
 
+    // Dialogue state (see openDialogue below)
+    this.dialogueBox = document.getElementById('dialogue-box');
+    this.dialogueText = document.getElementById('dialogue-text');
+    this.dialogueOptions = document.getElementById('dialogue-options');
+    this.dialogue = null;         // the tree currently being walked
+    this.currentOptions = [];     // live options, for number-key selection
+    this.onDialogueStart = () => { };
+    this.onDialogueEnd = () => { };
+
+    // Number keys pick dialogue choices — pointer lock never releases,
+    // which is why talking feels seamless instead of menu-like.
+    window.addEventListener('keydown', (e) => {
+      if (!this.isDialogueOpen) return;
+      const n = Number(e.code.replace('Digit', ''));
+      if (n >= 1 && n <= this.currentOptions.length) this.choose(this.currentOptions[n - 1]);
+    });
+
     document.getElementById('reader-close').addEventListener('click', () => this.close());
     // Clicking the dark backdrop (but not the card itself) also closes.
     this.panel.addEventListener('click', (e) => {
@@ -25,6 +42,46 @@ export class WorldUI {
 
   get isOpen() {
     return !this.panel.hidden;
+  }
+
+  get isDialogueOpen() {
+    return !this.dialogueBox.hidden;
+  }
+
+  // ---------- Dialogue (the avatar's speech) ----------
+  // Walks the node graph in dialogue.js: show text, render choices,
+  // follow `next` pointers until an option with `close` ends it.
+  openDialogue(tree) {
+    this.dialogue = tree;
+    this.dialogueBox.hidden = false;
+    this.setPrompt(null);
+    this.onDialogueStart();
+    this.#showNode(tree.start);
+  }
+
+  #showNode(id) {
+    const node = this.dialogue.nodes[id];
+    this.dialogueText.textContent = node.text;
+    this.currentOptions = node.options;
+    this.dialogueOptions.innerHTML = '';
+    node.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'dialogue-option';
+      btn.innerHTML = `<span class="dialogue-key">${i + 1}</span><span>${opt.label}</span>`;
+      btn.addEventListener('click', () => this.choose(opt));
+      this.dialogueOptions.appendChild(btn);
+    });
+  }
+
+  choose(opt) {
+    if (opt.close) this.closeDialogue();
+    else if (opt.next) this.#showNode(opt.next);
+  }
+
+  closeDialogue() {
+    this.dialogueBox.hidden = true;
+    this.dialogue = null;
+    this.onDialogueEnd();
   }
 
   // The "press E" hint. Passing null hides it.
@@ -68,6 +125,42 @@ export class WorldUI {
     this.content.querySelectorAll('.archive-item').forEach((btn) => {
       btn.addEventListener('click', () => this.openPost(posts[Number(btn.dataset.index)]));
     });
+  }
+
+  // The laptop on the desk. Projects come LIVE from the GitHub API —
+  // nothing to maintain: push a repo, it shows up. (Unauthenticated API
+  // calls are rate-limited to 60/hour per visitor IP — plenty for a
+  // portfolio page; we also fail soft with a link to the profile.)
+  async openProjects() {
+    this.#open(`
+      <p class="reader-kicker">PROJECTS</p>
+      <h1>What I'm building</h1>
+      <p class="reader-tagline">loading from GitHub…</p>
+    `);
+    try {
+      const res = await fetch('https://api.github.com/users/mlucky518/repos?sort=updated&per_page=10');
+      if (!res.ok) throw new Error('GitHub API ' + res.status);
+      const repos = (await res.json()).filter((r) => !r.fork);
+      const items = repos.map((r) => `
+        <a class="archive-item" href="${r.html_url}" target="_blank" rel="noopener">
+          <span class="archive-title">${r.name}${r.stargazers_count ? ' ★' + r.stargazers_count : ''}</span>
+          <span class="archive-date">${r.language ?? ''}</span>
+        </a>
+      `).join('');
+      this.content.innerHTML = `
+        <p class="reader-kicker">PROJECTS</p>
+        <h1>What I'm building</h1>
+        <div class="archive-list">${items}</div>
+        <p class="reader-footer"><a href="https://github.com/mlucky518" target="_blank" rel="noopener">everything on GitHub ↗</a></p>
+      `;
+    } catch (err) {
+      this.content.innerHTML = `
+        <p class="reader-kicker">PROJECTS</p>
+        <h1>What I'm building</h1>
+        <p>Couldn't reach GitHub right now — see
+        <a href="https://github.com/mlucky518" target="_blank" rel="noopener">github.com/mlucky518 ↗</a></p>
+      `;
+    }
   }
 
   openAbout() {

@@ -270,6 +270,8 @@
 }
 
 .archive-item {
+  text-decoration: none;
+  /* rows are <button> in the archive, <a> in projects */
   display: flex;
   justify-content: space-between;
   align-items: baseline;
@@ -305,6 +307,76 @@
   margin-top: 1.5rem;
   padding-top: 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ---------- Dialogue box (talking to the avatar) ---------- */
+
+#dialogue-box[hidden] {
+  display: none;
+}
+
+#dialogue-box {
+  position: fixed;
+  left: 50%;
+  bottom: 6vh;
+  transform: translateX(-50%);
+  width: min(640px, 92vw);
+  background: rgba(18, 18, 24, 0.94);
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  box-shadow: 0 0 40px color-mix(in srgb, var(--accent) 25%, transparent);
+  padding: 1.1rem 1.4rem;
+  z-index: 15;
+}
+
+#dialogue-name {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+  margin: 0 0 0.6rem;
+}
+
+#dialogue-text {
+  font-family: 'Outfit', sans-serif;
+  color: #e8e8e8;
+  line-height: 1.55;
+  margin: 0 0 0.9rem;
+}
+
+#dialogue-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.dialogue-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  color: #d8d8d8;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.92rem;
+  text-align: left;
+  padding: 0.5rem 0.7rem;
+  cursor: pointer;
+}
+
+.dialogue-option:hover {
+  border-color: var(--accent);
+  color: #ffffff;
+}
+
+.dialogue-key {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  color: #121212;
+  background: var(--accent);
+  padding: 0.28rem 0.4rem;
+  border-radius: 3px;
 }
 
 /* ---------- Reticle (center-screen aiming dot) ---------- */

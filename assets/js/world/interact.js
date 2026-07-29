@@ -51,14 +51,19 @@ export class Interactions {
     if (this.target) this.onActivate(this.target.userData.action);
   }
 
-  // Hover feedback: push the frame's emissive color toward the accent.
+  // Hover feedback: push the mesh's emissive color toward the accent.
   // "Emissive" = light the material emits by itself — it glows even
   // where no light reaches, perfect for a selection effect.
+  // Posters register one highlight mesh (the frame); GLB props register
+  // all their meshes so the whole model glows as one.
   #setHighlight(mesh, on) {
-    const frame = mesh?.userData.highlightMesh;
-    if (frame?.material?.emissive) {
-      frame.material.emissive.setHex(on ? ACCENT : 0x000000);
-      frame.material.emissiveIntensity = on ? 0.35 : 0;
+    if (!mesh) return;
+    const targets = mesh.userData.highlightMeshes ?? [mesh.userData.highlightMesh];
+    for (const t of targets) {
+      if (t?.material?.emissive) {
+        t.material.emissive.setHex(on ? ACCENT : 0x000000);
+        t.material.emissiveIntensity = on ? 0.35 : 0;
+      }
     }
   }
 }

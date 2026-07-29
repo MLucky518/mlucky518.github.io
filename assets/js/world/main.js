@@ -14,6 +14,9 @@
 import * as THREE from 'three';
 import { PlayerControls } from './controls.js';
 import { buildRoom, ROOM } from './room.js';
+import { decorateRoom } from './props.js';
+import { loadAvatar } from './avatar.js';
+import { DIALOGUE } from './dialogue.js';
 import { Interactions } from './interact.js';
 import { WorldUI } from './ui.js';
 
@@ -54,6 +57,12 @@ async function boot() {
   // The set: walls, lights, posters. Returns the interactive meshes.
   const { hotspots } = buildRoom(scene, posts);
 
+  // The furniture (async — GLB files download in parallel). The world is
+  // walkable immediately; props pop in when ready and bring their
+  // collision boxes with them. Interactive props (laptop, radio) push
+  // themselves into the shared `hotspots` array as they arrive.
+  const propsReady = decorateRoom(scene, hotspots);
+
   // The player. Bounds = room minus a margin so you stop AT walls, not in them.
   const controls = new PlayerControls(camera, canvas, {
     bounds: {
@@ -62,7 +71,22 @@ async function boot() {
     },
   });
 
+  propsReady.then(({ colliders }) => { controls.colliders.push(...colliders); })
+    .catch((err) => console.warn('props failed to load — room stays minimal', err));
+
+  // 3D Mike (12MB of FBX — loads in the background, pops in when ready).
+  // `avatar.update` gets called every frame once he exists.
+  let avatar = null;
+  loadAvatar(scene, hotspots).then((a) => {
+    avatar = a;
+    controls.colliders.push(a.collider);
+  }).catch((err) => console.warn('avatar failed to load', err));
+
   const ui = new WorldUI();
+  // Talking freezes walking (you stay planted mid-conversation) but the
+  // mouse stays locked — choices are picked with number keys.
+  ui.onDialogueStart = () => { controls.frozen = true; };
+  ui.onDialogueEnd = () => { controls.frozen = false; };
 
   // The raycaster, wired to the UI prompt and to real actions.
   const interactions = new Interactions(camera, hotspots, {
@@ -70,9 +94,11 @@ async function boot() {
     onActivate: (action) => {
       if (action.type === 'post') ui.openPost(action.post);
       else if (action.type === 'archive') ui.openArchive(posts);
+      else if (action.type === 'projects') ui.openProjects();
       else if (action.type === 'about') ui.openAbout();
       else if (action.type === 'contact') ui.openContact();
       else if (action.type === 'link') { window.location.href = action.href; return; }
+      else if (action.type === 'talk') { ui.openDialogue(DIALOGUE); return; } // keeps pointer lock!
       // Reading uses the mouse (scrolling, links), so give the cursor back.
       // ui.isOpen is already true here, which tells onUnlock below NOT to
       // treat this as "pause" — that's the whole panel/pause dance.
@@ -94,6 +120,7 @@ async function boot() {
   controls.onUnlock = () => {
     reticle.hidden = true;
     ui.setPrompt(null);
+    if (ui.isDialogueOpen) ui.closeDialogue(); // Esc mid-conversation = walk away
     if (!ui.isOpen) overlay.classList.remove('hidden'); // pause, not reading
   };
   // Closing the reader re-grabs the pointer (the close click is the
@@ -103,7 +130,7 @@ async function boot() {
 
   // --- Activation inputs: E or click, only while walking ---
   window.addEventListener('keydown', (e) => {
-    if (e.code === 'KeyE' && controls.isLocked) interactions.activate();
+    if (e.code === 'KeyE' && controls.isLocked && !ui.isDialogueOpen) interactions.activate();
     // Esc with the reader open: close it (browser Esc-unlock already
     // happened when the reader opened, so this is our job).
     if (e.code === 'Escape' && ui.isOpen) ui.close();
@@ -124,6 +151,7 @@ async function boot() {
     const dt = clock.getDelta();
     controls.update(dt);      // move the player...
     interactions.update();    // ...check what they're aiming at...
+    if (avatar) avatar.update(dt, camera); // ...let Mike notice them...
     renderer.render(scene, camera); // ...draw the frame
   });
 }
